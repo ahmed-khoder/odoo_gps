@@ -100,7 +100,7 @@ class GpsDaily(models.Model):
         harsh = g['harsh_brake'] + g['harsh_accel']
         final = fields.Datetime.now() - end > FINAL_AFTER
         vals = {
-            'device_id': device.id, 'date': day, 'driver_id': device.vehicle_id.driver_id.id or False,
+            'device_id': device.id, 'date': day, 'driver_id': device._gps_driver_partner().id or False,
             'distance_km': g['dist'] / 1000, 'moving_hours': moving_ms / 3.6e6, 'idle_hours': g['idle_ms'] / 3.6e6,
             'stopped_hours': g['stop_ms'] / 3.6e6, 'max_speed': g['max_speed'],
             'avg_speed': g['speed_sum'] / moving_ms if moving_ms else 0.0, 'trip_count': g['trips'],
