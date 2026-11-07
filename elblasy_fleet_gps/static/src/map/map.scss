@@ -197,7 +197,11 @@
         }
         &.o_gps_list_open .o_gps_panel { transform: none; }
         .o_gps_stage { flex: 1 1 100%; }
-        .o_gps_card { inset-inline: 0.5rem; inset-block-end: 0.5rem; width: auto; max-width: none; max-height: 62%; overflow-y: auto; }
+        .o_gps_card { inset-inline: 0.5rem; inset-block-end: 0.5rem; width: auto; max-width: none; max-height: 62%; overflow-y: auto;
+            // the whole card scrolls: no part of it is squeezed (the details list, which scrolls on its own, shrank to
+            // nothing on phones once the card grew)
+            > * { flex-shrink: 0; }
+            .o_gps_details { max-height: none; overflow: visible; } }
         &.o_gps_has_sel .o_gps_tools { inset-block-start: 0.75rem; }
         .o_gps_chips { padding-inline: 0.75rem; }
     }
