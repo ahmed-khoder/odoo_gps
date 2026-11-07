@@ -1,6 +1,6 @@
 {
     'name': 'Elblasy Fleet GPS (Traccar)',
-    'version': '20.0.1.3.0',
+    'version': '20.0.1.3.1',
     'author': 'Elblasy.app',
     'website': 'https://elblasy.app',
     'category': 'Human Resources/Fleet',
