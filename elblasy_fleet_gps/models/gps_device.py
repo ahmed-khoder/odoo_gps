@@ -70,7 +70,8 @@ class GpsDevice(models.Model):
         compute='_compute_subscription_state')
     vehicle_id = fields.Many2one('fleet.vehicle', string="Vehicle", index=True, tracking=True, ondelete='set null',
                                  check_company=True)
-    driver_id = fields.Many2one(related='vehicle_id.driver_id')
+    driver_id = fields.Many2one('res.partner', string="Driver", compute='_compute_driver_id',
+                                help="Who drives the vehicle now (see _gps_driver_partner; Fleet's driver by default).")
 
     status = fields.Selection(STATUS, default='unknown', index=True)
     last_update = fields.Datetime("Last Seen")
@@ -225,6 +226,22 @@ class GpsDevice(models.Model):
             # users are subscribed to their groups by the websocket automatically, no client-side channel needed
             self.env['bus.bus'].sudo()._sendone(group, BUS_TYPE, {})
 
+    @api.depends('vehicle_id.driver_id')
+    def _compute_driver_id(self):
+        for rec in self:
+            rec.driver_id = rec._gps_driver_partner()
+
+    # ── who drives the vehicle: one hook, so another module (e.g. a transport bridge) can say who is on board ──
+    def _gps_driver_partner(self):
+        """The driver's partner (stored on the daily report). Default: Fleet's driver of the vehicle."""
+        self.ensure_one()
+        return self.vehicle_id.driver_id
+
+    def _gps_driver_name(self):
+        """The name shown on the map, the list and the card (may name several drivers)."""
+        self.ensure_one()
+        return self._gps_driver_partner().name or False
+
     def _live_vals(self):
         self.ensure_one()
         v = self.vehicle_id
@@ -234,7 +251,7 @@ class GpsDevice(models.Model):
             'plate': v.license_plate or False,
             'vehicle_id': v.id or False,
             'vehicle': v.display_name if v else False,
-            'driver': self.driver_id.name or False,
+            'driver': self._gps_driver_name(),
             'category': self.category or 'default',
             'color': self.color or False,
             'status': self.status,
