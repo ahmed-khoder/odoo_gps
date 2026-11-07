@@ -232,8 +232,8 @@ class GpsDevice(models.Model):
             rec.driver_id = rec._gps_driver_partner()
 
     # ── who drives the vehicle: one hook, so another module (e.g. a transport bridge) can say who is on board ──
-    def _gps_driver_partner(self):
-        """The driver's partner (stored on the daily report). Default: Fleet's driver of the vehicle."""
+    def _gps_driver_partner(self, day=None):
+        """The driver's partner: now, or on `day` (the daily report asks for its own day). Default: Fleet's driver."""
         self.ensure_one()
         return self.vehicle_id.driver_id
 
